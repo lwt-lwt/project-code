@@ -2,16 +2,16 @@ import React, { Component } from 'react';
 import { Input, Button } from 'antd';
 import './index.less';
 
-
 const { TextArea } = Input;
 // const onSearch = value => console.log(value);
 export default class index extends Component {
     state = {
         // list 来更新文本框，data来存储后端数据
-        data: ['王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲', 
-                '王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲',
-                '王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲', 
-                '王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲'],
+        data: ['王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲',
+            '王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲',
+            '王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲',
+            '王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲'],
+        flag: false,
         orClicked: true,
         andClicked: false,
         clearClicked: false,
@@ -35,12 +35,10 @@ export default class index extends Component {
         if (e.type === 'click') {
             if (this.state.orClicked) {
                 value = 'OR';
-                const n = 2;
-                this.judge(tempText, currText, value, n);
+                this.judge(tempText, currText, value);
             } else if (this.state.andClicked) {
                 value = 'AND';
-                const n = 3;
-                this.judge(tempText, currText, value, n);
+                this.judge(tempText, currText, value);
             } else if (this.state.clearClicked) {
                 this.text = '';
                 this.setState({
@@ -55,29 +53,36 @@ export default class index extends Component {
         } else {
             this.setState({
                 value: currText
-            })
-            this.text = currText
+            });
+            this.text = currText;
         }
         // 获取焦点
-        document.getElementById('textArea').focus()
+        document.getElementById('textArea').focus();
     };
 
     // 点击按钮更新
     onClick = (e) => {
-        this.onChange(e)
+        this.onChange(e);
     }
 
     // 搜索回调
     onSearchClick = () => {
-        console.log(this.text)
+        console.log(this.text);
     }
 
     // 更换下方关键词
     onChangeBottomText = () => {
-        const newData = ['孙燕姿', '周深', '梁静茹']
+        const data = ['王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲',
+            '王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲',
+            '王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲',
+            '王冰冰', '周杰伦', 'Jay', '令狐冲', '王冰冰', '周杰伦', 'Jay', '令狐冲'];
+        const newData = ['孙燕姿', '周深', '梁静茹', '孙燕姿', '周深', '梁静茹',
+            '孙燕姿', '周深', '梁静茹', 'component', 'article', 'Typescript', 'JavaScript',
+            'react-dom', 'onSearchClick', 'onChangeButton', 'getElementById', 'onClick'];
         this.setState({
-            data: newData
-        })
+            data: this.state.flag ? data : newData,
+            flag: !this.state.flag
+        });
     }
 
     addOr = (e) => {
@@ -108,7 +113,6 @@ export default class index extends Component {
         }, function () {
             this.onChange(e)
         });
-        // this.onChange(e);
     }
 
 
