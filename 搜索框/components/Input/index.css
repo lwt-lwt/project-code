@@ -1,0 +1,43 @@
+#textArea {
+  max-width: 500px;
+}
+.changeContent {
+  margin: 5px;
+  width: 20px;
+}
+.orAnd {
+  margin: 5px 0 5px 0;
+}
+.orAnd .ant-input {
+  width: auto;
+  margin-right: 4px;
+}
+.orAnd .or {
+  margin-left: 2px;
+}
+.orAnd .addColor {
+  background-color: lightskyblue;
+}
+.changeKeyWords {
+  width: 550px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.changeKeyWords .keyWords {
+  width: 500px;
+  height: 110px;
+  overflow: hidden;
+}
+.changeKeyWords .keyWords .keyWord {
+  width: auto;
+  margin: 2px;
+}
+.changeKeyWords .changeButton .ant-btn {
+  width: 25px;
+  height: 60px;
+  line-height: 1px;
+}
+.changeKeyWords .changeButton .ant-btn .changeButtonText {
+  writing-mode: tb-rl;
+}
