@@ -17,28 +17,39 @@ export default class index extends Component {
         clearClicked: false,
     };
     text = '';
+    inputRef = React.createRef();
 
-    judge = (tempText, currText, value) => {
-        if (tempText.length > 0 && (tempText.slice(tempText.length - value.length) === value || tempText.slice(tempText.length - value.length - 1) === `${value} ` || currText === value)) {
-            this.text = currText === value ? tempText + ` ${value} ` : tempText + currText;
-        } else if (tempText.length === 0) {
-            this.text = currText + ' ';
+    judge = (tempText, currText, value, repValue) => {
+        if (tempText.length > 0) {
+            if (tempText.slice(tempText.length - value.length - 1) === `${value} `) {
+                if (currText === value) {
+                    this.text = tempText;
+                } else {
+                    this.text = tempText + currText;
+                }
+            } else if (tempText.slice(tempText.length - repValue.length - 1) === `${repValue} `) {
+                this.text = tempText.slice(0, tempText.length - repValue.length - 1) + `${value} `
+            } else {
+                this.text = currText === value ? tempText + ` ${value} ` : tempText + ` ${value} ` + currText;
+            }
         } else {
-            this.text = tempText + ` ${value} ` + currText;
+            this.text = currText + ' ';
         }
     }
 
     // 文本框内容更新
-    onChange = (e, value) => {
+    onChange = (e) => {
         let tempText = this.text;
         let currText = e.target.value;
         if (e.type === 'click') {
             if (this.state.orClicked) {
-                value = 'OR';
-                this.judge(tempText, currText, value);
+                const value = 'OR';
+                const repValue = 'AND';
+                this.judge(tempText, currText, value, repValue);
             } else if (this.state.andClicked) {
-                value = 'AND';
-                this.judge(tempText, currText, value);
+                const value = 'AND';
+                const repValue = 'OR';
+                this.judge(tempText, currText, value, repValue);
             } else if (this.state.clearClicked) {
                 this.text = '';
                 this.setState({
@@ -57,7 +68,7 @@ export default class index extends Component {
             this.text = currText;
         }
         // 获取焦点
-        document.getElementById('textArea').focus();
+        this.inputRef.current.focus();
     };
 
     // 点击按钮更新
@@ -115,7 +126,6 @@ export default class index extends Component {
         });
     }
 
-
     render() {
         const { data } = this.state;
 
@@ -137,6 +147,7 @@ export default class index extends Component {
                     autoSize={{ minRows: 1, maxRows: 6 }}
                     onChange={this.onChange}
                     value={this.text}
+                    ref={this.inputRef}
                 />
                 <Button type="primary" onClick={this.onSearchClick}>Search</Button>
                 <div className='orAnd'>
