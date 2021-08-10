@@ -1,0 +1,12 @@
+/* 这个文件主要用来写全局样式 */
+
+/* 使用rem，1rem就是1font-size。浏览器默认的font-size为16px，则1rem为10px */
+
+html {
+  font-size: 62.5%;
+}
+
+html body #root .APP {
+  /* vh：viewpoint。视口高度 */
+  min-height: 100vh;
+}
