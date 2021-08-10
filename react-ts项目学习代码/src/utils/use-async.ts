@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useReducer, useState } from "react";
 import { useMountedRef } from "utils";
 
 interface State<D> {
@@ -23,7 +23,7 @@ const defaultConfig = {
 
 
 // (initialState?: State<D>)是用户传入的state
-export const useAsync = <D>(initialState?: State<D>, initialConfig?: typeof defaultConfig) => {
+/* export const useAsync = <D>(initialState?: State<D>, initialConfig?: typeof defaultConfig) => {
     const config = { ...defaultConfig, initialConfig };
     const [state, setState] = useState<State<D>>({
         ...defaultInitialState,
@@ -74,8 +74,74 @@ export const useAsync = <D>(initialState?: State<D>, initialConfig?: typeof defa
             })
     }, [config.throwOnError, mountedRef, setData, setError])
 
+    return {
+        isIdle: state.stat === 'idle',
+        isLoading: state.stat === 'loading',
+        isError: state.stat === 'error',
+        isSuccess: state.stat === 'success',
+        run,
+        setData,
+        setError,
+        // 得到返回值以后刷新页面 retry被调用时，重新跑一遍run，让state刷新一遍
+        retry,
+        ...state
+    }
+}
+ */
 
+const useSafeDispatch = <T>(dispatch: (...args: T[]) => void) => {
+    const mountedRef = useMountedRef();
+    return useCallback((...args: T[]) => (mountedRef.current ? dispatch(...args) : void 0), [dispatch, mountedRef])
+}
+// 用useReducer改写useAsync
+export const useAsync = <D>(initialState?: State<D>, initialConfig?: typeof defaultConfig) => {
+    const config = { ...defaultConfig, initialConfig };
+    const [state, dispatch] = useReducer((state: State<D>, action: Partial<State<D>>) => ({ ...state, ...action }), {
+        ...defaultInitialState,
+        ...initialState
+    });
+    const safaDispatch = useSafeDispatch(dispatch);
+    const setData = useCallback((data: D) => safaDispatch({
+        data,
+        stat: 'success',
+        error: null
+    }), [safaDispatch])
+    const setError = useCallback((error: Error) => safaDispatch({
+        error,
+        stat: 'error',
+        data: null
+    }), [safaDispatch])
 
+    const [retry, setRetry] = useState(() => () => { })
+    // run 用来触发异步请求
+    // 增加一个retry配置，让其能够返回一个promise，能够实现自动重新渲染的目的
+    const run = useCallback((promise: Promise<D>, runConfig?: { retry: () => Promise<D> }) => {
+        // 没有then属性表示不是promise
+        if (!promise || !promise.then) {
+            throw new Error('请传入Promise类型数据');
+        }
+        setRetry(() => () => {
+            if (runConfig?.retry) {
+                run(runConfig?.retry(), runConfig)
+            }
+        })
+        // 传入的是正常的promise，就将异步请求触发刚开始时要改成loading，表示loading开始了
+        safaDispatch({ stat: 'loading' });
+        return promise
+            .then(data => {
+                setData(data);
+                return data;
+            })
+            .catch(error => {
+                // catch 会消化异常，如果不主动抛出，外面是接收不到异常的
+                setError(error);
+                if (config.throwOnError) {
+                    // return error; 不能抛出异常
+                    return Promise.reject(error);
+                }
+                return error;
+            })
+    }, [config.throwOnError, setData, setError, safaDispatch])
 
     return {
         isIdle: state.stat === 'idle',
